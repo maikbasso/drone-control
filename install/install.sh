@@ -1,0 +1,9 @@
+#!/bin/bash
+
+# @Author: Maik Basso <maik@maikbasso.com.br>
+
+# install linux dependencies
+sudo apt-get install -Y python-pip python-dev python-numpy python-opencv python-serial python-pyparsing python-wxgtk2.8
+
+# install python dependencies
+sudo python install-python-depencencies.py
