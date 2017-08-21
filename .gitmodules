@@ -1,0 +1,3 @@
+[submodule "drone-clients/test-plant-line-detection"]
+	path = drone-clients/test-plant-line-detection
+	url = https://github.com/maikbasso/plant-line-detection.git
