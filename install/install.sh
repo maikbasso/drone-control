@@ -7,3 +7,6 @@ sudo apt-get install -Y python-pip python-dev python-numpy python-opencv python-
 
 # install python dependencies
 sudo python install-python-depencencies.py
+
+# add current user in dialout group
+sudo adduser $USER dialout
