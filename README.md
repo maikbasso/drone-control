@@ -21,7 +21,7 @@ $ git submodule update
 ```
 Install all dependencies (enter your password if necessary):
 ```
-$ sh install/install.sh
+$ cd install && sh install.sh && cd ..
 ```
 
 ## Mount the server
@@ -33,13 +33,13 @@ $ nano drone-server/server.py
 ## Starting simulator [optional]
 Use the following command to start the simulator:
 ```
-$ sh startup/start-simulator.sh
+$ cd startup/ && sh start-simulator.sh
 ```
 
 ## Starting drone server
 Use the following command to start the server:
 ```
-$ sh startup/start-drone-server.sh
+$ cd startup/ && sh start-drone-server.sh
 ```
 
 ## Start ground station [optional]
