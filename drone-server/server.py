@@ -10,10 +10,10 @@ sys.path.append("../drone-lib")
 from dronecontrol import DroneControl
 
 #connect to simulator (vehicleHost, vehicleBaudRate, serverHost, serverPort, serverMaxClients)
-#drone = DroneControl("tcp:127.0.0.1:5760", 57600, "localhost", 7000, 12)
+drone = DroneControl("tcp:127.0.0.1:5760", 57600, "localhost", 7000, 12)
 
 #connect to vehicle
-drone = DroneControl("/dev/ttyACM0", 57600, "localhost", 7000, 12)
+#drone = DroneControl("/dev/ttyACM0", 57600, "localhost", 7000, 12)
 
 # auto startup clients [OPCIONAL]
 #drone.registerClient("python ../drone-clients/test-circle/client-test-circle.py")
