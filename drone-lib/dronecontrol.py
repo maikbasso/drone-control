@@ -98,7 +98,7 @@ class DroneControl:
 					if len(message) > 0:
 						cmd = json.loads(message)
 						#print "=> Received command:", cmd
-						self.commands.append(cmd)
+						self.commands.append([cmd, clientConn, clientAddress])
 						self.filterCommands()
 					else:
 						print "=> Client", clientAddress, "closed the connection."
@@ -116,12 +116,16 @@ class DroneControl:
 			if len(self.commands) > 0:
 				try:
 					#get the first command
-					cmd = self.commands[0]
+					cmd = self.commands[0][0]
 					#remove the first command from list
 					self.commands.remove(cmd)
 					#select and execute method by command
 					method = getattr(self.dccommands, cmd["command"])
-					method(cmd["args"])
+					response = method(cmd["args"])
+					#send the response to the client
+					if response != None:
+						# !!!!!!!! test if message is send from all or specifc client !!!!!!!!
+						self.command[0][1].send(response)
 				finally:
 					pass
 

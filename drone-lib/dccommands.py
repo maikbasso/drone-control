@@ -6,6 +6,7 @@ import time
 import math
 from dronekit import connect, VehicleMode, LocationGlobal, LocationGlobalRelative
 from pymavlink import mavutil
+import json
 
 class DCCommands:
 	
@@ -22,27 +23,31 @@ class DCCommands:
 	# ALL COMMANDS ARE IMPLEMENTED HERE!
 
 	def getParameters(self, args):
-		return self.vehicle.parameters
+		return json.dumps(self.vehicle.parameters)
 
 	def disableArmingCheck(self, args):
 		print "Disable arming check"
 		self.vehicle.parameters["ARMING_CHECK"] = 0
+		return None
 
 	def printArgs(self, args):
 		print "Command runs with args =", args
+		return None
 
 	def setSpeed(self, args):
 		# Set airspeed using attribute
 		self.vehicle.airspeed = args["airSpeed"] #m/s
 		# Set groundspeed using attribute
 		self.vehicle.groundspeed = args["groundSpeed"] #m/s
+		return None
 
 	def arm(self, args):
 		print "Basic pre-arm checks"
 		# Don't let the user try to arm until autopilot is ready
-		while not self.vehicle.is_armable:
-			print "Waiting for vehicle to initialise..."
-			time.sleep(1)
+		#while not self.vehicle.is_armable:
+		#	print "Waiting for vehicle to initialise..."
+		#	time.sleep(1)
+		return None
 
 		print "Arming motors"
 		# Copter should arm in GUIDED mode
@@ -53,21 +58,31 @@ class DCCommands:
 			print "Waiting for arming..."
 			time.sleep(1)
 
+		return None
+
 	def takeOff(self, args):
 		print "Taking off!"
 		self.vehicle.simple_takeoff(args["z"])
+
+		return None
 
 	def backToLand(self, args):
 		print "Back to the land"
 		self.vehicle.mode = VehicleMode("LAND")
 
+		return None
+
 	def returnToLaunch(self, args):
 		print "Return to launch"
 		self.vehicle.mode = VehicleMode("RTL")
 
+		return None
+
 	def rotateGimbal(self, args):
 		self.vehicle.gimbal.rotate(args["pitch"], args["roll"], args["yaw"])
 		time.sleep(2)
+
+		return None
 
 	def setVelocity(self, args):		
 		msg = self.vehicle.message_factory.set_position_target_local_ned_encode(
@@ -84,6 +99,8 @@ class DCCommands:
 		for x in range(0, args["duration"]):
 			self.vehicle.send_mavlink(msg)
 			time.sleep(1)
+
+		return None
 
 	def setPosition(self, args):
 		original_location = self.vehicle.location.global_frame
@@ -108,3 +125,24 @@ class DCCommands:
 
 		#go to new location
 		self.vehicle.simple_goto(targetlocation)
+
+		return None
+
+	def setGEOPosition(self, args):
+		original_location = self.vehicle.location.global_frame
+		if type(original_location) is LocationGlobal:
+		    targetlocation=LocationGlobal(args["lat"], args["lon"], args["alt"])
+		elif type(original_location) is LocationGlobalRelative:
+		    targetlocation=LocationGlobalRelative(args["lat"], args["lon"], args["alt"])
+		#go to new location
+		self.vehicle.simple_goto(targetlocation)
+
+		return None
+
+	def getGEOPosition(self, args):
+		original_location = self.vehicle.location.global_frame
+		return """{
+			"lat": """+ original_location.lat +""",
+			"lon": """+ original_location.lon +""",
+			"alt": """+ original_location.alt +""",			
+		}"""
