@@ -116,16 +116,16 @@ class DroneControl:
 			if len(self.commands) > 0:
 				try:
 					#get the first command
-					cmd = self.commands[0][0]
+					cmd = self.commands[0]
 					#remove the first command from list
 					self.commands.remove(cmd)
 					#select and execute method by command
-					method = getattr(self.dccommands, cmd["command"])
-					response = method(cmd["args"])
+					method = getattr(self.dccommands, cmd[0]["command"])
+					response = method(cmd[0]["args"])
 					#send the response to the client
 					if response != None:
 						# !!!!!!!! test if message is send from all or specifc client !!!!!!!!
-						self.command[0][1].send(response)
+						cmd[1].send(response)
 				finally:
 					pass
 
