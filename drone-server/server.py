@@ -22,7 +22,7 @@ drone = DroneControl("/dev/ttyACM0", 57600, "localhost", 7000, 12)
 #drone.registerClient("python ../drone-clients/test-square/client-test-square.py")
 #drone.registerClient("python ../drone-clients/test-virtual-joystick/client-test-virtual-joystick.py")
 #drone.registerClient("./../drone-clients/test-plant-line-detection/build/main")
-#drone.registerClient("./../drone-clients/test-xbee-control/main")
+drone.registerClient("./../drone-clients/test-xbee-control/main")
 
 #start clients
 drone.startClients()

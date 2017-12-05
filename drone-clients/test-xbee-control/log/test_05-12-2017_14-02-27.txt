@@ -1,0 +1,2 @@
+Connected with the Flight Controller
+Connected with the Xbee

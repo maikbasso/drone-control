@@ -8,7 +8,7 @@
 
 int main(){
 	//list of xbee
-	std::vector<int> xbeeList = {1};
+	std::vector<int> xbeeList = {3};
     
     //results file id
     time_t rawtime;
@@ -38,7 +38,7 @@ int main(){
 	// Waiting for commands
 	for(;;){
 		
-		for(int i; i <= xbeeList.size(); i++){
+		for(int i = 0; i < xbeeList.size(); i++){
 			std::string data;
 			
 			//receive data
