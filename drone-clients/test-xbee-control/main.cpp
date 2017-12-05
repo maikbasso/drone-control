@@ -7,6 +7,7 @@
 #include <vector>
 
 int main(){
+	std::cout.setf(std::ios::unitbuf);
 	//list of xbee
 	std::vector<int> xbeeList = {3};
     

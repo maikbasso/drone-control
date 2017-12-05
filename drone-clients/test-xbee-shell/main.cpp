@@ -6,14 +6,16 @@
 
 int main(){
 	
+	std::cout.setf(std::ios::unitbuf);
+	
 	// Setup Xbee radio connection
 	WSNXbee *w = new WSNXbee("/dev/serial0", 57600);
+	usleep(5000000);
 	std::cout << "Connected with the Xbee\n";
 	
 	std::cout << "Select radio: ";
 	int xbeeNumber;
 	std::cin >> xbeeNumber;
-	
 	
 	int option = -1;
 	
@@ -46,6 +48,8 @@ int main(){
 				option = -2;
 				break;
 		}
+		
+		usleep(1000000);
 	
 	}
 	

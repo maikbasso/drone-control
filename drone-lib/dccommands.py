@@ -47,7 +47,7 @@ class DCCommands:
 		#while not self.vehicle.is_armable:
 		#	print "Waiting for vehicle to initialise..."
 		#	time.sleep(1)
-		return None
+		#	return None
 
 		print "Arming motors"
 		# Copter should arm in GUIDED mode
