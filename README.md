@@ -73,3 +73,11 @@ An example command can be seen below:
 }
 ```
 A function in drone server receive these commands and decodes the JSON object, then executes the function indicated in the command and pass the array of arguments by parameter.
+
+## Pixhawk Configuration
+
+With pixhawk connected to QGroundControl, go to the parameter settings and change the following parameters:
+```
+#this is applicable if Pixhawk is connected to the Raspberry Pi by a USB connection
+CBRK_USB_CHK = 0 to 197848
+```

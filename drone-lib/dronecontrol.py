@@ -1,7 +1,7 @@
 #!/user/bin/python
 
 # @Author: Maik Basso <maik@maikbasso.com.br>
-
+# set parameter CBRK_USB_CHK = 197848
 import time
 import json
 import threading

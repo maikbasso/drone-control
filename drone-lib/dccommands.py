@@ -51,7 +51,11 @@ class DCCommands:
 
 		print "Arming motors"
 		# Copter should arm in GUIDED mode
-		self.vehicle.mode = VehicleMode("GUIDED")
+		#self.vehicle.mode = VehicleMode("GUIDED")
+		self.vehicle._master.mav.command_long_send(self.vehicle._master.target_system, self.vehicle._master.target_component,
+										   mavutil.mavlink.MAV_CMD_DO_SET_MODE, 0,
+										   4, #guided mode
+										   0, 0, 0, 0, 0, 0)
 		self.vehicle.armed = True
 
 		while not self.vehicle.armed:
