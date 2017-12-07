@@ -25,9 +25,10 @@ class DroneControl:
 	# CONSTRUCTOR AND DESTRUCTOR
 
 	def __init__(self, droneHost, droneBaud, socketHost, socketPort, socketMaxClients):
-		print "*" * 36
-		print "*** DroneControl is initialized! ***"
-		print "*" * 36
+		print ""
+		print "*" * 20
+		print "*** DroneControl ***"
+		print "*" * 20
 		#connect to the drone
 		self.conn(droneHost, droneBaud)
 		#create the server socket
@@ -36,7 +37,7 @@ class DroneControl:
 		self.threads.append(threading.Thread(target=self.waitingForClients))
 		self.threads.append(threading.Thread(target=self.runCommands))
 		#the program was initialized with success
-		print "=> DroneControl is initialized!"
+		print "=> DC > It is initialized!"
 		#start all threads
 		for t in self.threads:
 			t.start()
@@ -51,7 +52,7 @@ class DroneControl:
 			self.vehicle = connect(host, baud=baud, wait_ready=True)
 			self.dccommands = DCCommands(self.vehicle)
 			self.connected = True
-			print "=> Connected to vehicle on -host:", host, "-baudrate:", baud
+			print "=> DC > Connected to vehicle on -host:", host, "-baudrate:", baud
 
 	def createSocketServer(self, host, port, maxClients):
 		if self.socketServer is None:
@@ -61,29 +62,29 @@ class DroneControl:
 			self.socketServer.bind((host, port))
 			# Listem the clients
 			self.socketServer.listen(maxClients)
-			print "=> Socket server is started on -host:", host, "-port:", port
-			print "=> Allow connection for", maxClients, "clients."
+			print "=> DC > Socket server is started on -host:", host, "-port:", port
+			print "=> DC > Allow connection for", maxClients, "clients."
 
 	def disconnect(self):
 		if self.connected is True:
 			self.connected = False
 			self.socketServer.close()
 			self.vehicle.close()
-			print "=> Disconnecting from the vehicle and closing the socket server."
+			print "=> DC > Disconnecting from the vehicle and closing the socket server."
 
 	# COMMAND METHODS
 
 	def waitingForClients(self):
 		try:
 			while self.connected == True:
-				#print '=> Waiting for client connection...'
+				#print "=> DC > Waiting for client connection..."
 				conn, clientAddress = self.socketServer.accept()
-				print '=> Client', clientAddress,'conected!'
+				print "=> DC > Client", clientAddress,'conected!'
 				#create a Thread for each client
 				clientThread = threading.Thread(target=self.receiveCommands, args=(conn, clientAddress,))
 				clientThread.start()
 				self.threads.append(clientThread)
-				#print "=> Number of Threads:", len(self.threads)
+				print "=> DC > Number of Threads:", len(self.threads)
 		finally:
 			self.socketServer.close()
 
@@ -93,15 +94,15 @@ class DroneControl:
 				if clientConn is None:
 					break
 				else:
-					message = clientConn.recv(200)
-					print "===> Message:", message
+					message = clientConn.recv(120)
+					print "=> DC > received message:", message
 					if len(message) > 0:
 						cmd = json.loads(message)
-						#print "=> Received command:", cmd
+						print "=> DC > message decode:", cmd
 						self.commands.append([cmd, clientConn, clientAddress])
 						self.filterCommands()
 					else:
-						print "=> Client", clientAddress, "closed the connection."
+						print "=> DC > Client", clientAddress, "closed the connection."
 						clientConn.close()
 						clientConn = None
 			finally:
@@ -122,10 +123,13 @@ class DroneControl:
 					#select and execute method by command
 					method = getattr(self.dccommands, cmd[0]["command"])
 					response = method(cmd[0]["args"])
+					print "=> DC > Running command:", cmd[0]
 					#send the response to the client
 					if response != None:
 						# !!!!!!!! test if message is send from all or specifc client !!!!!!!!
 						cmd[1].send(response)
+						print "=> DC > Sending response:", response, "to client:", cmd[1]
+					time.sleep(1)
 				finally:
 					pass
 
@@ -133,6 +137,7 @@ class DroneControl:
 
 	def registerClient(self, commandLine):
 		self.clients.append(commandLine)
+		print "=> DC > client registred:", commandline
 
 	def startClients(self):
 		while self.connected is False:
@@ -142,3 +147,4 @@ class DroneControl:
 			t = threading.Thread(target=os.system, args=(commandLine,))
 			t.start()
 			self.threads.append(t)
+			print "=> DC > client started:", commandline

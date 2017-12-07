@@ -23,18 +23,20 @@ class DCCommands:
 	# ALL COMMANDS ARE IMPLEMENTED HERE!
 
 	def getParameters(self, args):
+		print "=> DC Commands > Get parameters", args
 		return json.dumps(self.vehicle.parameters)
 
 	def disableArmingCheck(self, args):
-		print "Disable arming check"
+		print "=> DC Commands > Disable arming check", args
 		self.vehicle.parameters["ARMING_CHECK"] = 0
 		return None
 
 	def printArgs(self, args):
-		print "Command runs with args =", args
+		print "=> DC Commands > Command runs with args =", args
 		return None
 
 	def setSpeed(self, args):
+		print "=> DC Commands > set speed", args
 		# Set airspeed using attribute
 		self.vehicle.airspeed = args["airSpeed"] #m/s
 		# Set groundspeed using attribute
@@ -42,14 +44,13 @@ class DCCommands:
 		return None
 
 	def arm(self, args):
-		print "Basic pre-arm checks"
+		print "=> DC Commands > Basic pre-arm checks", args
 		# Don't let the user try to arm until autopilot is ready
-		#while not self.vehicle.is_armable:
-		#	print "Waiting for vehicle to initialise..."
-		#	time.sleep(1)
-		#	return None
+		while not self.vehicle.is_armable:
+			print "=> DC Commands > Waiting for vehicle to initialise..."
+			time.sleep(1)
 
-		print "Arming motors"
+		print "=> DC Commands > Arming motors"
 		# Copter should arm in GUIDED mode
 		#self.vehicle.mode = VehicleMode("GUIDED")
 		self.vehicle._master.mav.command_long_send(self.vehicle._master.target_system, self.vehicle._master.target_component,
@@ -59,36 +60,45 @@ class DCCommands:
 		self.vehicle.armed = True
 
 		while not self.vehicle.armed:
-			print "Waiting for arming..."
+			print "=> DC Commands > Waiting for arming..."
 			time.sleep(1)
 
 		return None
 
 	def takeOff(self, args):
-		print "Taking off!"
+		print "=> DC Commands > Taking off!", args
 		self.vehicle.simple_takeoff(args["z"])
+		while True:
+			print("=> DC Commands > Altitude: ", self.vehicle.location.global_relative_frame.alt)
+			# Break and return from function just below target altitude.
+			if self.vehicle.location.global_relative_frame.alt >= args["z"] * 0.95:
+				print("=> DC Commands > Reached target altitude = ", args["z"])
+				break
+			time.sleep(1)
 
 		return None
 
 	def backToLand(self, args):
-		print "Back to the land"
+		print "=> DC Commands > Back to the land", args
 		self.vehicle.mode = VehicleMode("LAND")
 
 		return None
 
 	def returnToLaunch(self, args):
-		print "Return to launch"
+		print "=> DC Commands > Return to launch", args
 		self.vehicle.mode = VehicleMode("RTL")
 
 		return None
 
 	def rotateGimbal(self, args):
+		print "=> DC Commands > Rotate gimbal", args
 		self.vehicle.gimbal.rotate(args["pitch"], args["roll"], args["yaw"])
 		time.sleep(2)
 
 		return None
 
-	def setVelocity(self, args):		
+	def setVelocity(self, args):
+		print "=> DC Commands > set velocity", args	
 		msg = self.vehicle.message_factory.set_position_target_local_ned_encode(
         0,       # time_boot_ms (not used)
         0, 0,    # target system, target component
@@ -107,6 +117,7 @@ class DCCommands:
 		return None
 
 	def setPosition(self, args):
+		print "=> DC Commands > set position", args
 		original_location = self.vehicle.location.global_frame
 		dNorth = args["y"]
 		dEast = args["x"]
@@ -133,17 +144,19 @@ class DCCommands:
 		return None
 
 	def setGEOPosition(self, args):
+		print "=> DC Commands > set geo position", args
 		original_location = self.vehicle.location.global_frame
 		if type(original_location) is LocationGlobal:
 		    targetlocation=LocationGlobal(args["lat"], args["lon"], args["alt"])
 		elif type(original_location) is LocationGlobalRelative:
 		    targetlocation=LocationGlobalRelative(args["lat"], args["lon"], args["alt"])
 		#go to new location
-		self.vehicle.simple_goto(targetlocation)
+		self.vehicle.simple_goto(targetlocation, groundspeed=args["groundspeed"])
 
 		return None
 
 	def getGEOPosition(self, args):
+		print "=> DC Commands > get geo position", args
 		original_location = self.vehicle.location.global_frame
 		return """{
 			"lat": """+ original_location.lat +""",
