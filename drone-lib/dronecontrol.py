@@ -137,7 +137,7 @@ class DroneControl:
 
 	def registerClient(self, commandLine):
 		self.clients.append(commandLine)
-		print "=> DC > client registred:", commandline
+		print "=> DC > client registred:", commandLine
 
 	def startClients(self):
 		while self.connected is False:
@@ -147,4 +147,4 @@ class DroneControl:
 			t = threading.Thread(target=os.system, args=(commandLine,))
 			t.start()
 			self.threads.append(t)
-			print "=> DC > client started:", commandline
+			print "=> DC > client started:", commandLine
