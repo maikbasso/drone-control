@@ -9,7 +9,7 @@
 int main(){
 	std::cout.setf(std::ios::unitbuf);
 	//list of xbee
-	std::vector<int> xbeeList = {3};
+	std::vector<int> xbeeList = {5};
     
     //results file id
     time_t rawtime;
@@ -17,7 +17,7 @@ int main(){
     char buffer[80];
     time (&rawtime);
     timeinfo = localtime(&rawtime);
-    strftime(buffer,sizeof(buffer),"log/test_%d-%m-%Y_%H-%M-%S.txt",timeinfo);
+    strftime(buffer,sizeof(buffer),"/home/pi/drone-control/drone-clients/test-xbee-control/log/test_%d-%m-%Y_%H-%M-%S.txt",timeinfo);
     string resultsFileId(buffer);
 
     //results file
@@ -45,17 +45,23 @@ int main(){
 			//receive data
 			w->receive(xbeeList.at(i), data);
 			
+			
 			// if data isn't empty
 			if (!data.empty()) {
 				
-				// send command to the flight controller
-				c->sendData(data);
-				
+				using json = nlohmann::json;
+				auto j3 = json::parse(data);
+				int drone = j3["drone"];
+				if(drone == 2){
+					// send command to the flight controller
+					c->sendData(data);
+				}
 				// writing log
 				resultsFile << data << "\n";
 				resultsFile.flush();
 				
 			}
+						
         }
         
         //one in one second

@@ -91,6 +91,20 @@ void WSNXbee::selectRadio(int n){
 			memset(&this->address, 0, sizeof(this->address));
 			this->address.addr64_enabled = 1;
 			this->address.addr64[0] = 0x00;
+			this->address.addr64[1] = 0x13;
+			this->address.addr64[2] = 0xA2;
+			this->address.addr64[3] = 0x00;
+			this->address.addr64[4] = 0x40;
+			this->address.addr64[5] = 0xAE;
+			this->address.addr64[6] = 0x9C;
+			this->address.addr64[7] = 0x55;
+			status = 1;
+			this->actualRadio = n;
+		}
+		else if(n == 5){
+			memset(&this->address, 0, sizeof(this->address));
+			this->address.addr64_enabled = 1;
+			this->address.addr64[0] = 0x00;
 			this->address.addr64[1] = 0x00;
 			this->address.addr64[2] = 0x00;
 			this->address.addr64[3] = 0x00;

@@ -46,9 +46,9 @@ class DCCommands:
 	def arm(self, args):
 		print "=> DC Commands > Basic pre-arm checks", args
 		# Don't let the user try to arm until autopilot is ready
-		while not self.vehicle.is_armable:
-			print "=> DC Commands > Waiting for vehicle to initialise..."
-			time.sleep(1)
+		#while not self.vehicle.is_armable:
+		#	print "=> DC Commands > Waiting for vehicle to initialise..."
+		#	time.sleep(1)
 
 		print "=> DC Commands > Arming motors"
 		# Copter should arm in GUIDED mode
@@ -59,9 +59,9 @@ class DCCommands:
 										   0, 0, 0, 0, 0, 0)
 		self.vehicle.armed = True
 
-		while not self.vehicle.armed:
-			print "=> DC Commands > Waiting for arming..."
-			time.sleep(1)
+		#while not self.vehicle.armed:
+		#	print "=> DC Commands > Waiting for arming..."
+		#	time.sleep(1)
 
 		return None
 
@@ -78,6 +78,143 @@ class DCCommands:
 
 		return None
 
+	def armAndTakeOff(self, args):
+		#Arms vehicle and fly to aTargetAltitude (args).
+		
+		print "=> DC Commands > Basic pre-arm checks"
+		# Don't try to arm until autopilot is ready
+		while not self.vehicle.is_armable:
+			if self.vehicle.mode.name == "INITIALISING":
+				print "=> DC Commands > Waiting for vehicle to initialise"
+				time.sleep(1)
+			while self.vehicle.gps_0.fix_type < 2:
+				print "=> DC Commands > Waiting for GPS...:", self.vehicle.gps_0.fix_type
+				time.sleep(1)
+			#print " Waiting for vehicle to initialise..."
+			time.sleep(1)
+
+		print "=> DC Commands > Arming motors"
+		# Copter should arm in GUIDED mode
+		self.vehicle.mode = VehicleMode("GUIDED")
+		self.vehicle.armed = True    
+
+		# Confirm vehicle armed before attempting to take off
+		while not self.vehicle.armed:      
+			print "=> DC Commands > Waiting for arming..."
+			time.sleep(1)
+
+		print "=> DC Commands > Taking off!"
+		self.vehicle.simple_takeoff(args["z"]) # Take off to target altitude
+
+		# Wait until the vehicle reaches a safe height before processing the goto (otherwise the command 
+		#  after Vehicle.simple_takeoff will execute immediately).
+		while True:
+			print "=> DC Commands > Altitude: ", self.vehicle.location.global_relative_frame.alt 
+			#Break and return from function just below target altitude.        
+			if self.vehicle.location.global_relative_frame.alt>=args["z"]*0.95: 
+				print "=> DC Commands > Reached target altitude"
+				break
+			time.sleep(1)
+		
+		return None
+	
+	def squareMissionVale(self, args):
+		print "=> DC Commands > Set default/target airspeed to 5"
+		self.vehicle.airspeed = 5
+		print "=> DC Commands > Set Altitude to 10 meters"
+
+		print "=> DC Commands > Going towards first point for 15 seconds (groundspeed set to 10 m/s)..."
+		point1 = LocationGlobalRelative(-30.0762617, -51.1177915, 10)
+		self.vehicle.simple_goto(point1, groundspeed=10)
+
+		# sleep so we can see the change in map
+		time.sleep(15)
+
+		print "=> DC Commands > Going towards second point for 15 seconds (groundspeed set to 10 m/s)..."
+		point2 = LocationGlobalRelative(-30.0764381, -51.1176950, 10)
+		self.vehicle.simple_goto(point2, groundspeed=10)
+
+		# sleep so we can see the change in map
+		time.sleep(15)
+
+		print "=> DC Commands > Going towards third point for 15 seconds (groundspeed set to 10 m/s) ..."
+		point3 = LocationGlobalRelative(-30.0763522, -51.1174375, 10)
+		self.vehicle.simple_goto(point3, groundspeed=10)
+
+		# sleep so we can see the change in map
+		time.sleep(15)
+
+		print "=> DC Commands > Going towards fourth point for 15 seconds (groundspeed set to 10 m/s) ..."
+		point4 = LocationGlobalRelative(-30.0761689, -51.1175475, 10)
+		self.vehicle.simple_goto(point4, groundspeed=10)
+
+		# sleep so we can see the change in map
+		time.sleep(15)
+
+		print "=> DC Commands > Returning to Launch"
+		self.vehicle.mode = VehicleMode("RTL")
+
+		#Close vehicle object before exiting script
+		print "=> DC Commands > Close vehicle object"
+		#self.vehicle.close()
+
+		return None
+	    
+	def spyMissionVale(self, args):
+		print "Set default/target airspeed to 5"
+		self.vehicle.airspeed = 5
+		print "=> DC Commands > Set Altitude to 5 meters"
+
+		print "=> DC Commands > Going towards first point for 15 seconds (groundspeed set to 5 m/s)..."
+		point1 = LocationGlobalRelative(-30.0763267, -51.1180839, 5)
+		self.vehicle.simple_goto(point1, groundspeed=5)
+
+		# sleep so we can see the change in map
+		time.sleep(15)
+
+		print "=> DC Commands > Going towards second point for 15 seconds (groundspeed set to 10 m/s)..."
+		point2 = LocationGlobalRelative(-30.0761689, -51.1175475, 5)
+		self.vehicle.simple_goto(point2, groundspeed=10)
+
+		# sleep so we can see the change in map
+		time.sleep(15)
+
+		print "=> DC Commands > Going towards third point for 15 seconds (groundspeed set to 5 m/s) ..."
+		point3 = LocationGlobalRelative(-30.0762756, -51.1174750, 5)
+		self.vehicle.simple_goto(point3, groundspeed=5)
+
+		# sleep so we can see the change in map
+		time.sleep(5)
+
+		print "=> DC Commands > Going towards fourth point for 15 seconds (groundspeed set to 10 m/s) ..."
+		point4 = LocationGlobalRelative(-30.0764358, -51.1180410, 5)
+		self.vehicle.simple_goto(point4, groundspeed=10)
+
+		# sleep so we can see the change in map
+		time.sleep(15)
+		
+		print "=> DC Commands > Going towards fifth point for 15 seconds (groundspeed set to 5 m/s) ..."
+		point5 = LocationGlobalRelative(-30.0765542, -51.1179847, 5)
+		self.vehicle.simple_goto(point5, groundspeed=5)
+
+		# sleep so we can see the change in map
+		time.sleep(5)
+
+		print "=> DC Commands > Going towards sixth point for 15 seconds (groundspeed set to 10 m/s) ..."
+		point6 = LocationGlobalRelative(-30.0763986, -51.1174133, 5)
+		self.vehicle.simple_goto(point6, groundspeed=10)
+
+		# sleep so we can see the change in map
+		time.sleep(15)
+
+		print "=> DC Commands > Returning to Launch"
+		self.vehicle.mode = VehicleMode("RTL")
+
+		#Close vehicle object before exiting script
+		print "=> DC Commands > Close vehicle object"
+		#self.vehicle.close()
+		return None
+	
 	def backToLand(self, args):
 		print "=> DC Commands > Back to the land", args
 		self.vehicle.mode = VehicleMode("LAND")
