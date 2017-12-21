@@ -4,13 +4,16 @@
 
 import time
 import math
-from dronekit import connect, VehicleMode, LocationGlobal, LocationGlobalRelative
+from dronekit import connect, VehicleMode, LocationGlobal, LocationGlobalRelative, Command
 from pymavlink import mavutil
 import json
 
 class DCCommands:
 	
 	vehicle = None
+	autoCmds = None
+	autoCmdsCount = 0
+	lastAutoCmd = None
 
 	# CONSTRUCTOR AND DESTRUCTOR
 
@@ -161,7 +164,7 @@ class DCCommands:
 		return None
 	    
 	def spyMissionVale(self, args):
-		print "Set default/target airspeed to 5"
+		print "=> DC Commands > Set default/target airspeed to 5"
 		self.vehicle.airspeed = 5
 		print "=> DC Commands > Set Altitude to 5 meters"
 
@@ -300,3 +303,47 @@ class DCCommands:
 			"lon": """+ original_location.lon +""",
 			"alt": """+ original_location.alt +""",			
 		}"""
+	
+	def initAutoMission(self, args):
+		print "=> DC Commands > Create auto mission commands"
+		self.autoCmds = self.vehicle.commands
+		#self.autoCmds.download()
+		#self.autoCmds.wait_ready() # wait until download is complete.
+		print "=> DC Commands > Clear all commands"
+		self.autoCmds.clear()
+		print "=> DC Commands > Add MAV_CMD_NAV_TAKEOFF command. This is ignored if the vehicle is already in the air."
+		self.autoCmds.add(Command( 0, 0, 0, mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT, mavutil.mavlink.MAV_CMD_NAV_TAKEOFF, 0, 0, 0, 0, 0, 0, 0, 0, args["alt"]))
+		return None
+		
+	def addWayPointAutoMission(self, args):
+		print "=> DC Commands > Add waypoint ", args
+		point = LocationGlobal(args["lat"], args["lon"], args["alt"])
+		self.lastAutoCmd = Command( 0, 0, 0, mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT, mavutil.mavlink.MAV_CMD_NAV_WAYPOINT, 0, 0, 0, 0, 0, 0, point.lat, point.lon, point.alt)
+		self.autoCmds.add(self.lastAutoCmd)
+		self.autoCmdsCount = self.autoCmdsCount + 1
+		return None
+		
+	def startAutoMission(self, args):
+		print "=> DC Commands > Add dummy waypoint (duplicate the last waypoint)"
+		self.autoCmds.add(self.lastAutoCmd)
+		
+		print "=> DC Commands > Upload new commands to vehicle"
+		self.autoCmds.upload()
+		
+		print "=> DC Commands > Reset mission set to first (0) waypoint"
+		self.vehicle.commands.next = 0
+		
+		print "=> DC Commands > Set mode to AUTO to start mission"
+		self.vehicle.mode = VehicleMode("AUTO")
+		
+		print "=> DC Commands > waiting vehicle complete mission"
+		while True:
+			nextwaypoint = self.vehicle.commands.next
+			print "=> DC Commands > Next waypoint (%s)" % (nextwaypoint)
+			if nextwaypoint == len(self.autoCmdsCount):
+				print "=> DC Commands > End Mission"
+				break;
+			time.sleep(1)
+
+		print "=> DC Commands > Return to launch"
+		self.vehicle.mode = VehicleMode("RTL")

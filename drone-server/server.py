@@ -29,6 +29,7 @@ drone = DroneControl("/dev/ttyACM0", 57600, "localhost", 7000, 12)
 drone.registerClient("./../drone-clients/test-xbee-control/main")
 #drone.registerClient("./../drone-clients/test-xbee-shell/main")
 #drone.registerClient("./../drone-clients/test-xbee-single-takeoff/main")
+#drone.registerClient("python ../drone-clients/test-auto-mission/client-test-auto-mission.py")
 
 #start clients
 drone.startClients()

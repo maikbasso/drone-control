@@ -5,6 +5,7 @@
 #include "wsn-xbee.hpp"
 #include "json.hpp"
 #include <vector>
+#include <chrono>
 
 int main(){
 	std::cout.setf(std::ios::unitbuf);
@@ -52,13 +53,20 @@ int main(){
 				using json = nlohmann::json;
 				auto j3 = json::parse(data);
 				int drone = j3["drone"];
-				if(drone == 2){
+				if(drone == 1){
 					// send command to the flight controller
 					c->sendData(data);
 				}
-				// writing log
-				resultsFile << data << "\n";
-				resultsFile.flush();
+				else if(drone == 99){
+					long timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now()).time_since_epoch()).count();
+					resultsFile << data << "\t" << timestamp << "\n";
+					resultsFile.flush();
+				}
+				else{
+					// writing log
+					resultsFile << data << "\n";
+					resultsFile.flush();
+				}
 				
 			}
 						
