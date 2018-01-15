@@ -7,6 +7,8 @@ import math
 from dronekit import connect, VehicleMode, LocationGlobal, LocationGlobalRelative, Command
 from pymavlink import mavutil
 import json
+import logging
+from time import gmtime, strftime
 
 class DCCommands:
 	
@@ -14,6 +16,7 @@ class DCCommands:
 	autoCmds = None
 	autoCmdsCount = 0
 	lastAutoCmd = None
+	frameworkTestsLog = None
 
 	# CONSTRUCTOR AND DESTRUCTOR
 
@@ -347,3 +350,19 @@ class DCCommands:
 
 		print "=> DC Commands > Return to launch"
 		self.vehicle.mode = VehicleMode("RTL")
+
+	def frameworkTests(self, args):
+		threadNumber = args["threadNumber"]
+		timeSend = args["timeSend"]
+		timestamp = time.time() * 1000
+		totalTime = timestamp - timeSend
+
+		if self.frameworkTestsLog == None:
+			self.frameworkTestsLog = logging
+			now = strftime("%Y-%m-%d_%H:%M:%S", gmtime())
+			self.frameworkTestsLog.basicConfig(filename='/home/pi/drone-control/drone-clients/test-framework-drone-control/logs/fw-tests-'+str(now)+'.log', filemode='w',level=logging.DEBUG)
+			self.frameworkTestsLog.info("threadNumber\ttimeSend\ttimestamp\ttotalTime")
+
+		self.frameworkTestsLog.info("%s\t%s\t%s\t%s"%(threadNumber, timeSend, timestamp, totalTime))
+
+		return None
