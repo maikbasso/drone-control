@@ -3,24 +3,20 @@
 # @Author: Maik Basso <maik@maikbasso.com.br>
 # set parameter CBRK_USB_CHK = 197848
 import time
-import json
-import threading
 import socket
 import os
-import math
 from dronekit import connect, VehicleMode, LocationGlobal, LocationGlobalRelative
 from pymavlink import mavutil
-from dccommands import DCCommands
+from droneclient import DroneClient
 
 class DroneControl:
 	
 	vehicle = None
 	connected = False
-	commands = list()
-	dccommands = None
 	threads = list()
 	socketServer = None
 	clients = list()
+	droneClients = list()
 
 	# CONSTRUCTOR AND DESTRUCTOR
 
@@ -33,14 +29,9 @@ class DroneControl:
 		self.conn(droneHost, droneBaud)
 		#create the server socket
 		self.createSocketServer(socketHost, socketPort, socketMaxClients)
-		#runs all methoads assincronously
-		self.threads.append(threading.Thread(target=self.waitingForClients))
-		self.threads.append(threading.Thread(target=self.runCommands))
 		#the program was initialized with success
 		print "=> DC > It is initialized!"
-		#start all threads
-		for t in self.threads:
-			t.start()
+		self.waitingForClients()
 
 	def __del__(self):
 		self.disconnect()
@@ -50,7 +41,6 @@ class DroneControl:
 	def conn(self, host, baud):
 		if self.vehicle is None:
 			self.vehicle = connect(host, baud=baud, wait_ready=True)
-			self.dccommands = DCCommands(self.vehicle)
 			self.connected = True
 			print "=> DC > Connected to vehicle on -host:", host, "-baudrate:", baud
 
@@ -68,6 +58,8 @@ class DroneControl:
 	def disconnect(self):
 		if self.connected is True:
 			self.connected = False
+			for d in self.droneClients:
+				d.setConnectionStatus(False)
 			self.socketServer.close()
 			self.vehicle.close()
 			print "=> DC > Disconnecting from the vehicle and closing the socket server."
@@ -81,57 +73,11 @@ class DroneControl:
 				conn, clientAddress = self.socketServer.accept()
 				print "=> DC > Client", clientAddress,'conected!'
 				#create a Thread for each client
-				clientThread = threading.Thread(target=self.receiveCommands, args=(conn, clientAddress,))
-				clientThread.start()
-				self.threads.append(clientThread)
-				print "=> DC > Number of Threads:", len(self.threads)
+				dc = DroneClient(self.vehicle, conn, clientAddress)
+				self.droneClients.append(dc)
+				print "=> DC > Number of Clients:", len(self.droneClients)
 		finally:
 			self.socketServer.close()
-
-	def receiveCommands(self, clientConn, clientAddress):
-		while True:
-			try:
-				if clientConn is None:
-					break
-				else:
-					message = clientConn.recv(120)
-					print "=> DC > received message:", message
-					if len(message) > 0:
-						cmd = json.loads(message)
-						print "=> DC > message decode:", cmd
-						self.commands.append([cmd, clientConn, clientAddress])
-						self.filterCommands()
-					else:
-						print "=> DC > Client", clientAddress, "closed the connection."
-						clientConn.close()
-						clientConn = None
-			finally:
-				pass
-
-	def filterCommands(self):
-		# Not necessary, Pixhawk itself takes care of it
-		pass
-
-	def runCommands(self):
-		while self.connected == True:
-			if len(self.commands) > 0:
-				try:
-					#get the first command
-					cmd = self.commands[0]
-					#remove the first command from list
-					self.commands.remove(cmd)
-					#select and execute method by command
-					method = getattr(self.dccommands, cmd[0]["command"])
-					response = method(cmd[0]["args"])
-					print "=> DC > Running command:", cmd[0]
-					#send the response to the client
-					if response != None:
-						# !!!!!!!! test if message is send from all or specifc client !!!!!!!!
-						cmd[1].send(response)
-						print "=> DC > Sending response:", response, "to client:", cmd[1]
-					time.sleep(1)
-				finally:
-					pass
 
 	# CLIENTS METHODS
 

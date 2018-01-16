@@ -8,7 +8,7 @@ import math
 import threading
 
 numberOfTests = 33
-maxNumberOfClients = 12
+maxNumberOfClients = 2
 sequence = 0
 threads = list()
 
@@ -20,9 +20,9 @@ def runClient(threadNumber, numberOfTests):
 	# run all tasks
 	for c in xrange(0, numberOfTests):
 		timestamp = time.time() * 1000
-		print timestamp
+		print threadNumber, timestamp 
 		client.sendall('{"command": "frameworkTests", "args": {"threadNumber": '+str(threadNumber)+',"timeSend": '+str(timestamp)+'}}')
-		time.sleep(3)
+		time.sleep(0.5)
 
 #create all threads
 for c in xrange(0, maxNumberOfClients):
