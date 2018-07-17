@@ -8,7 +8,7 @@ $ cd ~ && git clone https://github.com/maikbasso/drone-control.git
 ```
 Install Drone-Control with all dependencies:
 ```
-$ sh ~/drone-control/scripts/install.sh
+$ sh ~/drone-control/scripts/install-drone-control.sh
 ```
 
 ## Configure the server
