@@ -9,9 +9,6 @@ sys.path.append("../drone-lib")
 # import DroneControl lib
 from dronecontrol import DroneControl
 
-#connect to simulator (vehicleHost, vehicleBaudRate, serverHost, serverPort, serverMaxClients)
-#drone = DroneControl("tcp:127.0.0.1:5760", 57600, "localhost", 7000, 12)
-
 #connect to vehicle
 #drone = DroneControl("udpin:0.0.0.0:14550", 57600, "localhost", 7000, 12)
 drone = DroneControl("/dev/ttyACM0", 57600, "localhost", 7000, 12)
@@ -26,10 +23,11 @@ drone = DroneControl("/dev/ttyACM0", 57600, "localhost", 7000, 12)
 #drone.registerClient("python ../drone-clients/test-square/client-test-square.py")
 #drone.registerClient("python ../drone-clients/test-virtual-joystick/client-test-virtual-joystick.py")
 #drone.registerClient("./../drone-clients/test-plant-line-detection/build/main")
-drone.registerClient("./../drone-clients/test-xbee-control/main")
+#drone.registerClient("./../drone-clients/test-xbee-control/main")
 #drone.registerClient("./../drone-clients/test-xbee-shell/main")
 #drone.registerClient("./../drone-clients/test-xbee-single-takeoff/main")
 #drone.registerClient("python ../drone-clients/test-auto-mission/client-test-auto-mission.py")
+drone.registerClient("python ../drone-clients/test-simple-takeoff/client-test-simple-takeoff.py")
 
 #start clients
 drone.startClients()
