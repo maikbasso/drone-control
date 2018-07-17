@@ -2,6 +2,10 @@
 Autonomous mission control framework for single or multiple UAV.
 
 ## Install on Raspberry PI using the Raspbian OS
+Install Git:
+```
+$ sudo apt-get install git
+```
 Clone Drone-Control repository at home folder:
 ```
 $ cd ~ && git clone https://github.com/maikbasso/drone-control.git
