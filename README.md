@@ -1,5 +1,5 @@
-# drone-control
-Autonomous mission control for single or multiple UAV.
+# Drone-Control
+Autonomous mission control framework for single or multiple UAV.
 
 ## Install on Raspberry PI using the Raspbian OS
 Clone Drone-Control repository at home folder:
