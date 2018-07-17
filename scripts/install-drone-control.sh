@@ -2,6 +2,12 @@
 
 # @Author: Maik Basso <maik@maikbasso.com.br>
 
+# update your operating system
+sudo apt-get update -y
+sudo apt-get upgrade -y
+sudo apt-get dist-upgrade -y
+sudo rpi-update -y
+
 # install linux dependencies
 sudo apt-get install -y python-pip python-dev python-numpy python-opencv python-serial python-pyparsing python-wxgtk2.8
 
