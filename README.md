@@ -18,25 +18,25 @@ $ sh ~/drone-control/scripts/install-drone-control.sh
 ## Configure the server
 Edit the `server.py` file to compose your system structure. Configure the connection to your flight control.
 ```
-$ nano ~/drone-control/drone-server/server.py
+$ nano ~/drone-control/server.py
 ```
 
 ## Starting drone server
 Use the following command to start the server:
 ```
-$ sh ~/drone-control/scripts/start-drone-server.sh
+$ python server.py
 ```
 
 ## Start the clients manually [optional]
 For example, start the `client-shell` using this command:
 ```
-$ python ~/drone-control/drone-clients/test-shell/client-test-shell.py
+$ python ~/drone-control/clients/test-shell/client-test-shell.py
 ```
 
 ## Implement your commands
 Edit the `dccommands.py` file to implement your functions.
 ```
-$ nano ~/drone-control/drone-lib/dccommands.py
+$ nano ~/drone-control/lib/dccommands.py
 ```
 Each command is represented by a function in class `DCCommands`. Each command can be exchanged between client and server. A command is a JSON object with basically two items. The first `command` represents the name of the command to execute and the second item is` args` which is an array of parameters for the function.
 An example command can be seen below:

@@ -29,10 +29,7 @@ class DCCommands:
 	# to set PX4 Fligth Mode
 	def PX4setMode(self, mavMode):
 		print "=> DC Commands > Set PX4 flight mode to GUIDED"
-	    vehicle._master.mav.command_long_send(vehicle._master.target_system, vehicle._master.target_component,
-	                                               mavutil.mavlink.MAV_CMD_DO_SET_MODE, 0,
-	                                               mavMode,
-	                                               0, 0, 0, 0, 0, 0)
+		vehicle._master.mav.command_long_send(vehicle._master.target_system, vehicle._master.target_component, mavutil.mavlink.MAV_CMD_DO_SET_MODE, 0, mavMode, 0, 0, 0, 0, 0, 0)
 
 	# ALL COMMANDS ARE IMPLEMENTED HERE!
 

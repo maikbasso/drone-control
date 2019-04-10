@@ -33,6 +33,19 @@ class DroneControl:
 		print "=> DC > It is initialized!"
 		self.waitingForClients()
 
+	def __init__(self, droneHost, socketHost, socketPort, socketMaxClients):
+		print ""
+		print "*" * 20
+		print "*** DroneControl ***"
+		print "*" * 20
+		#connect to the drone
+		self.connUDP(droneHost)
+		#create the server socket
+		self.createSocketServer(socketHost, socketPort, socketMaxClients)
+		#the program was initialized with success
+		print "=> DC > It is initialized!"
+		self.waitingForClients()
+
 	def __del__(self):
 		self.disconnect()
 
@@ -41,6 +54,12 @@ class DroneControl:
 	def conn(self, host, baud):
 		if self.vehicle is None:
 			self.vehicle = connect(host, baud=baud, wait_ready=True)
+			self.connected = True
+			print "=> DC > Connected to vehicle on -host:", host, "-baudrate:", baud
+
+	def connUDP(self, host):
+		if self.vehicle is None:
+			self.vehicle = connect(host, wait_ready=True)
 			self.connected = True
 			print "=> DC > Connected to vehicle on -host:", host, "-baudrate:", baud
 

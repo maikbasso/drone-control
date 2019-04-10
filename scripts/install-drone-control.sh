@@ -3,11 +3,10 @@
 # @Author: Maik Basso <maik@maikbasso.com.br>
 
 # update your operating system
-echo "Updating OS and Raspberry Pi Firmware"
+echo "Updating OS"
 sudo apt-get update -y
 sudo apt-get upgrade -y
 sudo apt-get dist-upgrade -y
-sudo rpi-update -y
 
 echo "Installing all dependencies"
 # install linux dependencies
@@ -35,7 +34,3 @@ git submodule init
 git submodule update
 
 echo "Installation Complete."
-
-# update flight control firmware
-echo "* Please keep the firmware of your flight control updated."
-echo "* Please keep the drone sensors calibrated."
