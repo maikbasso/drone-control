@@ -29,7 +29,7 @@ class DCCommands:
 	# to set PX4 Fligth Mode
 	def PX4setMode(self, mavMode):
 		print "=> DC Commands > Set PX4 flight mode to GUIDED"
-		vehicle._master.mav.command_long_send(vehicle._master.target_system, vehicle._master.target_component, mavutil.mavlink.MAV_CMD_DO_SET_MODE, 0, mavMode, 0, 0, 0, 0, 0, 0)
+		self.vehicle._master.mav.command_long_send(self.vehicle._master.target_system, self.vehicle._master.target_component, mavutil.mavlink.MAV_CMD_DO_SET_MODE, 0, mavMode, 0, 0, 0, 0, 0, 0)
 
 	# ALL COMMANDS ARE IMPLEMENTED HERE!
 
@@ -52,6 +52,7 @@ class DCCommands:
 		self.vehicle.airspeed = args["airSpeed"] #m/s
 		# Set groundspeed using attribute
 		self.vehicle.groundspeed = args["groundSpeed"] #m/s
+		time.sleep(1)
 		return None
 
 	def arm(self, args):
@@ -62,9 +63,9 @@ class DCCommands:
 			time.sleep(1)
 
 		# Copter should arm in GUIDED mode
-		#self.vehicle.mode = VehicleMode("GUIDED")
+		self.vehicle.mode = VehicleMode("GUIDED")
 		
-		self.PX4setMode(4)
+		#self.PX4setMode(4)
 
 		print "=> DC Commands > Arming motors"
 		self.vehicle.armed = True
@@ -94,6 +95,11 @@ class DCCommands:
 		return None
 
 	def backToLand(self, args):
+		print "=> DC Commands > Back to the land", args
+		self.vehicle.mode = VehicleMode("LAND")
+		return None
+
+	def backToLandAndWait(self, args):
 		print "=> DC Commands > Back to the land", args
 		self.vehicle.mode = VehicleMode("LAND")
 		return None
@@ -153,6 +159,57 @@ class DCCommands:
 		self.vehicle.simple_goto(targetlocation)
 
 		return None
+
+####################################################################################################
+	def setPositionAndWait(self, args):
+		print "=> DC Commands > set position", args
+		original_location = self.vehicle.location.global_frame
+		
+		distNorth = args["y"]
+		distEast = args["x"]
+		alt = original_location.alt + args["z"]
+		
+		#Radius of "spherical" earth
+		earth_radius=6378137.0
+	    
+	    #Coordinate offsets in radians
+		dLat = distNorth/earth_radius
+		dLon = distEast/(earth_radius*math.cos(math.pi*original_location.lat/180))
+
+		#New position in decimal degrees
+		newlat = original_location.lat + (dLat * 180/math.pi)
+		newlon = original_location.lon + (dLon * 180/math.pi)
+		if type(original_location) is LocationGlobal:
+		    targetlocation=LocationGlobal(newlat, newlon, alt)
+		elif type(original_location) is LocationGlobalRelative:
+		    targetlocation=LocationGlobalRelative(newlat, newlon, alt)
+
+		#go to new location
+		self.vehicle.simple_goto(targetlocation)
+
+		pointNotReached = 1
+		while(pointNotReached):			
+			original_location = self.vehicle.location.global_frame    # em graus
+			
+			latRad = original_location.lat*math.pi/180      # passa pra rad
+			lonRad = original_location.lon*math.pi/180
+
+			deltaNorth = dNorth - latRad*earth_radius
+			deltaEast  = dEast - lonRad*(earth_radius*math.cos(latRad))
+			deltaAlt = original_location.alt - alt
+
+			dist = math.sqrt(deltaNorth**2 + deltaEast**2 + deltaAlt**2)
+
+			print "DeltaNORTH :  ", deltaNorth
+			print "DeltaEAST  :  ", deltaEast
+			print "DISTANCIA :  ", dist
+			time.sleep(500)
+
+			if dist<0.5:
+				pointNotReached=0
+
+		return None
+####################################################################################################
 
 	def setGEOPosition(self, args):
 		print "=> DC Commands > set geo position", args

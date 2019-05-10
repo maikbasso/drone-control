@@ -5,7 +5,8 @@
 import time
 import socket
 import os
-from dronekit import connect, VehicleMode, LocationGlobal, LocationGlobalRelative
+from dronekit import connect, VehicleMode, LocationGlobalRelative, LocationGlobal, Vehicle, mavutil
+from dronekit_sitl import SITL
 from pymavlink import mavutil
 from droneclient import DroneClient
 
@@ -59,9 +60,11 @@ class DroneControl:
 
 	def connUDP(self, host):
 		if self.vehicle is None:
+			print "=> DC > Connecting vehicle to Gazebo on -host:", host
+			print('Connecting to vehicle on: %s' % host)
 			self.vehicle = connect(host, wait_ready=True)
 			self.connected = True
-			print "=> DC > Connected to vehicle on -host:", host, "-baudrate:", baud
+			print "=> DC > Connected to vehicle on -host:", host
 
 	def createSocketServer(self, host, port, maxClients):
 		if self.socketServer is None:
@@ -88,7 +91,7 @@ class DroneControl:
 	def waitingForClients(self):
 		try:
 			while self.connected == True:
-				#print "=> DC > Waiting for client connection..."
+				print "=> DC > Waiting for client connection..."
 				conn, clientAddress = self.socketServer.accept()
 				print "=> DC > Client", clientAddress,'conected!'
 				#create a Thread for each client

@@ -73,9 +73,10 @@ class DroneClient:
 			if len(self.commands) > 0:
 				try:
 					#get the first command
-					cmd = self.commands[0]
+					cmd0 = self.commands[0]
+					cmd = cmd0[:]
 					#remove the first command from list
-					self.commands.remove(cmd)
+					self.commands.remove(cmd0)
 					#select and execute method by command
 					method = getattr(self.dccommands, cmd[0]["command"])
 					response = method(cmd[0]["args"])
